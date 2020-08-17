@@ -6,14 +6,6 @@ import (
 	"strconv"
 )
 
-var cache = map[int]*User{}
-
-type User struct {
-	Name string `json:"name" binding:"required"`
-	Age  int `json:"age"`
-	Id   int `json:"id" binding:"required"`
-}
-
 func AddUser(ctx *gin.Context){
 	u := new(User)
 	err := ctx.ShouldBindJSON(u)
@@ -21,10 +13,10 @@ func AddUser(ctx *gin.Context){
 		HttpBadRequest(ctx, "参数错误!", nil)
 		return
 	}
-	if _, ok := cache[u.Id]; ok{
+	if _, ok := UserCache[u.Id]; ok{
 		HttpBadRequest(ctx, "用户已存在，创建失败!", nil)
 	}else{
-		cache[u.Id] = u
+		UserCache[u.Id] = u
 		HttpOk(ctx, "成功创建用户!", u)
 	}
 }
@@ -36,7 +28,7 @@ func DeleteUser(ctx *gin.Context){
 		HttpBadRequest(ctx, "参数错误!", nil)
 		return
 	}
-	delete(cache, id)
+	delete(UserCache, id)
 	HttpOk(ctx, "成功删除！", nil)
 }
 
@@ -47,10 +39,10 @@ func ModifyUser(ctx *gin.Context){
 		HttpBadRequest(ctx, "参数错误!", nil)
 		return
 	}
-	if _, ok := cache[id]; ok {
+	if _, ok := UserCache[id]; ok {
 		u := new(User)
 		ctx.ShouldBindJSON(u)
-		cache[u.Id] = u
+		UserCache[u.Id] = u
 		HttpOk(ctx, "成功修改用户!", u)
 	} else {
 		HttpBadRequest(ctx, "用户不存在!", nil)
@@ -64,7 +56,7 @@ func GetUser(ctx *gin.Context) {
 		HttpBadRequest(ctx, "用户不存在!", nil)
 		return
 	}
-	if u, ok := cache[id]; ok {
+	if u, ok := UserCache[id]; ok {
 		HttpOk(ctx, "成功获取用户!", u)
 	} else {
 		HttpBadRequest(ctx, "用户不存在!", nil)
@@ -81,12 +73,12 @@ func GetUsers(ctx *gin.Context){
 		return
 	}
 	if size == 0 || page == 0 {
-		size = len(cache)
+		size = len(UserCache)
 	}
 
 	i := 0
 	users := make([]*User, 0, size)
-	for _, user := range cache {
+	for _, user := range UserCache {
 		users = append(users, user)
 		i++
 		if i == size {

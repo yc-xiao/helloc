@@ -9,7 +9,8 @@ import (
 )
 
 func main() {
-	f, _ := os.Create("helloc.log")
+	f, _ := os.Create("HelloC.log")
+	defer f.Close()
 	gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
 	r := gin.Default()
 	routers.AddRouters(r)

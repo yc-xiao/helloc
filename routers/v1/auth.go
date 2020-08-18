@@ -5,7 +5,14 @@ import (
 	"Helloc/utils"
 	"github.com/gin-gonic/gin"
 )
-
+// @Summary 登录认证
+// @Description 通过JWT验证账号密码，获取token
+// @Tags 认证
+// @Accept json
+// @Param json body string true "用户id"
+// @Success 200 {string} json "{"msg": "token生成成功!", "results": "tokenString"}"
+// @Failure 400 {string} json "{"msg": "参数错误/token生成失败!/账号不存在或密码错误", "results": null}"
+// @Router /auth/ [post]
 func Auth(ctx *gin.Context)  {
 	user := struct {
 		Id int `json:"id" binding:"required"`

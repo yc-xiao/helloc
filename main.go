@@ -5,6 +5,8 @@ import (
 	_ "Helloc/docs"
 	"Helloc/routers"
 	"github.com/gin-gonic/gin"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	"github.com/swaggo/gin-swagger/swaggerFiles"
 	"io"
 	"os"
 )
@@ -20,7 +22,7 @@ func main() {
 	defer f.Close()
 	gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
 	r := gin.Default()
-	//r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	routers.AddRouters(r)
 
 	if port, ok := confs.Cfg["HTTP_PORT"]; ok {

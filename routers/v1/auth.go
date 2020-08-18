@@ -9,7 +9,7 @@ import (
 // @Description 通过JWT验证账号密码，获取token
 // @Tags 认证
 // @Accept json
-// @Param json body string true "用户id"
+// @Param body body string true "id => 用户id, name => 用户名, passowrd => 用户密码" default({"id": 1, "name": "1", "password": "1"})
 // @Success 200 {string} json "{"msg": "token生成成功!", "results": "tokenString"}"
 // @Failure 400 {string} json "{"msg": "参数错误/token生成失败!/账号不存在或密码错误", "results": null}"
 // @Router /auth/ [post]

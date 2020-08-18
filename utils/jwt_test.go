@@ -8,12 +8,12 @@ import (
 
 func TestJwt(t *testing.T) {
 	u := models.User{Name: "小明", Age: 18, Id: 1}
-	token, err := generateJwt(&u)
+	token, err := GenerateJwt(&u)
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Println(token)
-	token2, userInfo, err := checkJwt(token)
+	token2, userInfo, err := CheckJwt(token)
 	if err != nil {
 		t.Fatal(err)
 	}

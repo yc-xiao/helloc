@@ -1,20 +1,14 @@
 package main
 
 import (
+	"Helloc/models"
 	"fmt"
 	"testing"
 )
 
 func TestName(t *testing.T) {
-	cache := map[int]string{1:"1", 2:"2"}
-	a := [10]string{}
-	i := 0
-	for _, v := range cache{
-		a[i] = v
-		i++
-		if i == 1 {
-			break
-		}
+	for i:=0 ; i <= 20; i++ {
+		u, _ := models.UserCache[i]
+		fmt.Println(u.IsAdmin)
 	}
-	fmt.Println(a)
 }

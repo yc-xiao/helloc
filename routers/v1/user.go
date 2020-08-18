@@ -1,27 +1,28 @@
 package v1
 
 import (
+	. "Helloc/models"
 	. "Helloc/utils"
 	"github.com/gin-gonic/gin"
 	"strconv"
 )
 
-func AddUser(ctx *gin.Context){
+func AddUser(ctx *gin.Context) {
 	u := new(User)
 	err := ctx.ShouldBindJSON(u)
 	if err != nil {
 		HttpBadRequest(ctx, "参数错误!", nil)
 		return
 	}
-	if _, ok := UserCache[u.Id]; ok{
+	if _, ok := UserCache[u.Id]; ok {
 		HttpBadRequest(ctx, "用户已存在，创建失败!", nil)
-	}else{
+	} else {
 		UserCache[u.Id] = u
 		HttpOk(ctx, "成功创建用户!", u)
 	}
 }
 
-func DeleteUser(ctx *gin.Context){
+func DeleteUser(ctx *gin.Context) {
 	sid := ctx.Param("id")
 	id, err := strconv.Atoi(sid)
 	if err != nil {
@@ -32,7 +33,7 @@ func DeleteUser(ctx *gin.Context){
 	HttpOk(ctx, "成功删除！", nil)
 }
 
-func ModifyUser(ctx *gin.Context){
+func ModifyUser(ctx *gin.Context) {
 	sid := ctx.Param("id")
 	id, err := strconv.Atoi(sid)
 	if err != nil {
@@ -63,7 +64,7 @@ func GetUser(ctx *gin.Context) {
 	}
 }
 
-func GetUsers(ctx *gin.Context){
+func GetUsers(ctx *gin.Context) {
 	pageParam := ctx.DefaultQuery("page", "0")
 	sizeParam := ctx.DefaultQuery("size", "0")
 	page, err1 := strconv.Atoi(pageParam)
@@ -87,4 +88,3 @@ func GetUsers(ctx *gin.Context){
 	}
 	HttpOk(ctx, "成功获取用户列表!", users)
 }
-

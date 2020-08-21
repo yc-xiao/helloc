@@ -7,15 +7,15 @@ import (
 )
 
 func TestJwt(t *testing.T) {
-	u := models.User{Name: "小明", Age: 18, Id: 1}
-	token, err := GenerateJwt(&u)
+	u := models.User{Id:1, NickName:"小明", Account: "xiaoming", IsAdmin: true}
+	token, err := DefaultGenerateJwt(&u)
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Println(token)
-	token2, userInfo, err := CheckJwt(token)
+	_, userInfo, err := CheckJwt(token)
 	if err != nil {
 		t.Fatal(err)
 	}
-	fmt.Println(token2, userInfo)
+	fmt.Println(userInfo)
 }

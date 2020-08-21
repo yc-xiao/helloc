@@ -13,21 +13,27 @@ var jwtSecret=[]byte(confs.Cfg["JWT_SECRET"])
 
 type UserInfo struct {
 	UserId int
-	UserName string
+	NickName string
+	Account string
 	IsAdmin bool
 	jwt.StandardClaims
 }
 
-func GenerateJwt(user *models.User) (string, error){
-	// 1. 封装数据到jwt (过期时间，账号信息，)
+func DefaultGenerateJwt(user *models.User) (string, error){
 	hourStr, _ := confs.Cfg["EXPIRES_HOURS"]
 	hourInt, err := strconv.Atoi(hourStr)
 	if err != nil {
 		hourInt = 8
 	}
+	return GenerateJwt(user, hourInt)
+}
+
+func GenerateJwt(user *models.User, hourInt int)(string, error){
+	// 1. 封装数据到jwt (过期时间，账号信息，)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &UserInfo{
 		UserId: user.Id,
-		UserName: user.Name,
+		Account: user.Account,
+		NickName: user.NickName,
 		IsAdmin: user.IsAdmin,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Duration(hourInt) * time.Hour).Unix(), //过期时间

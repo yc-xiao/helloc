@@ -3,6 +3,7 @@ package main
 import (
 	"Helloc/confs"
 	_ "Helloc/docs"
+	"Helloc/models/utils"
 	"Helloc/routers"
 	"github.com/gin-gonic/gin"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -20,6 +21,8 @@ import (
 func main() {
 	f, _ := os.Create("HelloC.log")
 	defer f.Close()
+	defer utils.DB.Close()
+
 	gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
 	r := gin.Default()
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

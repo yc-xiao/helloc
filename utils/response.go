@@ -11,4 +11,5 @@ func HttpOk(ctx *gin.Context, msg string, results interface{}) {
 
 func HttpBadRequest(ctx *gin.Context, msg string, results interface{}) {
 	ctx.JSON(http.StatusBadRequest, gin.H{"message": msg, "results": results})
+	ctx.Abort()
 }

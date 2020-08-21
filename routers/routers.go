@@ -12,17 +12,19 @@ func AddRouters(r *gin.Engine) {
 	v1 := r.Group("api/v1")
 	{
 		v1.POST("auth/", v.Auth)
+		v1.POST("auth2/", v.Auth2)
 	}
 
 	{
 		u := v1.Group("users/")
+		u.GET("", v.GetUsers)
 		u.Use(middlewares.JwtCheckMiddleWare())
 		{
-			u.POST("", v.AddUser)
+			u.POST("", middlewares.IsAdmin(), v.AddUser)
 			u.DELETE(":id", middlewares.IsAdmin(), v.DeleteUser)
-			u.PUT(":id", v.ModifyUser)
+			u.PUT(":id", middlewares.OwnerOrAdmin(),v.ModifyUser)
 			u.GET(":id", v.GetUser)
-			u.GET("", v.GetUsers)
+			//u.GET("", v.GetUsers)
 		}
 	}
 

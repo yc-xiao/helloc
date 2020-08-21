@@ -1,12 +1,11 @@
-package models
+package utils
 
 import "strconv"
 
 // 临时替代数据库
+var TempUserCache = map[int]*TempUser{}
 
-var UserCache = map[int]*User{}
-
-type User struct {
+type TempUser struct {
 	Id   int `json:"id" binding:"required"`
 	Name string `json:"name" binding:"required"`
 	Password string `json:"password" binding:"required"`
@@ -21,7 +20,6 @@ func init() {
 		}else{
 			isAdmin = false
 		}
-		UserCache[i] = &User{i, strconv.Itoa(i),strconv.Itoa(i), isAdmin }
+		TempUserCache[i] = &TempUser{i, strconv.Itoa(i),strconv.Itoa(i), isAdmin }
 	}
 }
-

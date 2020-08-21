@@ -13,8 +13,8 @@
     - 2.4 关注/站内信/日志功能　待做
 
 3. 模型
-    - 用户(id, nickname, account, password, email, phone, isAdmin, photo(头像), createdTime)(微信)
-    - 视频(id, userid, title, desc, label, rm, duration(时长), videoFile, createdTime, pass, type)
+    - 用户(id, nickname, account, password, email, phone, isAdmin, photoFile(头像), createdTime)(微信)
+    - 视频(id, userId, title, desc, category, label, rm, duration(时长), videoFile, createdTime, pass)
     - 评论(id, objId, model, context, createdTime)            
 
 4. TODO
@@ -22,3 +22,4 @@
     - 4.2 用户消息
     - 4.3 视频弹幕
     - 4.4 用户空间大小，视频上传大小
+    - 4.5 直播

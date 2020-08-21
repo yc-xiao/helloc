@@ -16,7 +16,6 @@ func init() {
 	paths := strings.Split(curPath, "Helloc")
 	filePath := path.Join(paths[0], "Helloc/confs/base.ini")
 	fmt.Println(filePath)
-
 	cfg, err := ini.Load(filePath)
 	if err != nil {
 		log.Fatalf("Fail to parse 'confs/base.ini': %v", err)
@@ -26,4 +25,9 @@ func init() {
 			Cfg[key.Name()] = key.Value()
 		}
 	}
+	rootPath := path.Join(paths[0], "Helloc")
+	Cfg["ROOT"] = rootPath
+	Cfg["STATIC"] = path.Join(rootPath, Cfg["STATIC"])
+	Cfg["VIDEOS"] = path.Join(rootPath, Cfg["VIDEOS"])
+	Cfg["IMAGES"] = path.Join(rootPath, Cfg["IMAGES"])
 }

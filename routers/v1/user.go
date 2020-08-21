@@ -59,7 +59,7 @@ func DeleteUser(ctx *gin.Context) {
 // @Tags 用户
 // @Accept json
 // @Param id path string true "用户id" default(1)
-// @Param body body string true "用户信息" default({"nickname": "小明", "account": "xiaoming", "password": "123456", "email": "", "phone": ""})
+// @Param body body string true "用户信息" default({"nickname": "小明", "password": "123456", "email": "", "phone": ""})
 // @Success 200 {string} json "{"message":"成功修改用户!","results":{"id":1,"nickname":"小明","account":"xiaoming","password":"123456","email":"","phone":"","isAdmin":false,"photoFile":"","createdTime":""}}}"
 // @Failure 400 {string} json "{"msg": "参数错误/用户不存在!/用户修改失败!", "results": null}"
 // @Router /users/{id}/ [put]
@@ -70,16 +70,17 @@ func ModifyUser(ctx *gin.Context) {
 		HttpBadRequest(ctx, "参数错误!", nil)
 		return
 	}
-
 	u := new(models.User)
-	u.Id = id
 	if err = ctx.ShouldBindJSON(u); err!=nil{
 		HttpBadRequest(ctx, "参数错误!", nil)
 		return
 	}
 	GetSql := fmt.Sprintf("select * from user where id=%d", id)
-	if db.Get(new(models.User), GetSql){
-		if db.Modify(u){
+	user := new(models.User)
+	if db.Get(user, GetSql){
+		// 只允许修改NickName, Password, Email, Phone
+		user.NickName, user.Password, user.Email, user.Phone = u.NickName, u.Password, u.Email, u.Phone
+		if db.Modify(user){
 			HttpOk(ctx, "成功修改用户!", u)
 		}else{
 			HttpBadRequest(ctx, "用户修改失败!", nil)

@@ -12,7 +12,7 @@ import (
 var jwtSecret=[]byte(confs.Cfg["JWT_SECRET"])
 
 type UserInfo struct {
-	UserId int
+	Id int
 	NickName string
 	Account string
 	IsAdmin bool
@@ -31,7 +31,7 @@ func DefaultGenerateJwt(user *models.User) (string, error){
 func GenerateJwt(user *models.User, hourInt int)(string, error){
 	// 1. 封装数据到jwt (过期时间，账号信息，)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &UserInfo{
-		UserId: user.Id,
+		Id: user.Id,
 		Account: user.Account,
 		NickName: user.NickName,
 		IsAdmin: user.IsAdmin,

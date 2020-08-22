@@ -4,11 +4,14 @@ import (
 	"Helloc/middlewares"
 	v "Helloc/routers/v1"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 func AddRouters(r *gin.Engine) {
 	r.Static("static/", "./static/")
-
+	r.GET("/", func(ctx *gin.Context) {
+		ctx.Redirect(http.StatusMovedPermanently,"/swagger/index.html")
+	})
 	v1 := r.Group("api/v1")
 	// 登录认证
 	{

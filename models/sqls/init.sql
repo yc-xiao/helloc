@@ -1,7 +1,7 @@
 create database if not exists H;
 
 /*
-create user 'hello'@'%' identity by '123456' if not exists;
+create user 'hello'@'%' identified by '123456';
 grant all on H.* to 'hello'@'%';
 */
 

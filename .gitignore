@@ -2,4 +2,3 @@
 *.log
 go.mod
 go.sum
-docs

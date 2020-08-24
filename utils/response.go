@@ -5,6 +5,11 @@ import (
 	"net/http"
 )
 
+type ResponseStruct struct {
+	Message string `json:"message"`
+	Results interface{} `json:"results"`
+}
+
 func HttpOk(ctx *gin.Context, msg string, results interface{}) {
 	ctx.JSON(http.StatusOK, gin.H{"message": msg, "results": results})
 }

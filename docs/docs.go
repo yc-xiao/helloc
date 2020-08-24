@@ -101,6 +101,43 @@ var doc = `{
                 }
             }
         },
+        "/test/": {
+            "post": {
+                "description": "只有管理员可以添加用户",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "test"
+                ],
+                "summary": "新增用户",
+                "parameters": [
+                    {
+                        "description": "Utest",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.Utest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"msg\":\"创建用户完成!\",\"results\":{\"id\":1,\"nickname\":\"小明\",\"account\":\"xiaoming\",\"password\":\"123456\",\"email\":\"\",\"phone\":\"\",\"isAdmin\":false,\"photoFile\":\"\",\"createdTime\":\"\"}}}",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ResponseStruct"
+                        }
+                    },
+                    "400": {
+                        "description": "{\"msg\": \"参数错误/用户已存在，创建失败!\", \"results\": null}",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ResponseStruct"
+                        }
+                    }
+                }
+            }
+        },
         "/users/": {
             "get": {
                 "description": "暂时无权限/后需要登录",
@@ -151,27 +188,38 @@ var doc = `{
                 "summary": "新增用户",
                 "parameters": [
                     {
-                        "default": "{\"nickname\": \"小明\", \"account\": \"xiaom\", \"password\": \"123456\", \"email\": \"\", \"phone\": \"\", \"isAdmin\": false, \"photoFile\":\"\"}",
-                        "description": "account(*账号), passowrd(*密码) ",
-                        "name": "body",
+                        "description": "??",
+                        "name": "Body",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/v1.AddUserParam"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "{\"message\":\"创建用户完成!\",\"results\":{\"id\":1,\"nickname\":\"小明\",\"account\":\"xiaoming\",\"password\":\"123456\",\"email\":\"\",\"phone\":\"\",\"isAdmin\":false,\"photoFile\":\"\",\"createdTime\":\"\"}}}",
+                        "description": "返回参数",
                         "schema": {
-                            "type": "string"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.ResponseStruct"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "results": {
+                                            "$ref": "#/definitions/v1.AddUserParam"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
-                        "description": "{\"msg\": \"参数错误/用户已存在，创建失败!\", \"results\": null}",
+                        "description": "{\"message\": \"参数错误/用户已存在，创建失败!\", \"results\": null}",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/utils.ResponseStruct"
                         }
                     }
                 }
@@ -515,6 +563,62 @@ var doc = `{
                         "description": "{\"msg\": \"视频审核失败!\", \"results\": null}",
                         "schema": {
                             "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "utils.ResponseStruct": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "results": {
+                    "type": "object"
+                }
+            }
+        },
+        "v1.AddUserParam": {
+            "type": "object",
+            "required": [
+                "account",
+                "nickname"
+            ],
+            "properties": {
+                "account": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "nickname": {
+                    "type": "string",
+                    "example": "2"
+                }
+            }
+        },
+        "v1.Utest": {
+            "type": "object",
+            "properties": {
+                "body": {
+                    "type": "object",
+                    "properties": {
+                        "code": {
+                            "description": "Required: true",
+                            "type": "string"
+                        },
+                        "data": {
+                            "description": "An optional field name to which this validation applies",
+                            "type": "object"
+                        },
+                        "msg": {
+                            "description": "Required: true",
+                            "type": "string"
+                        },
+                        "status": {
+                            "description": "Required: true",
+                            "type": "boolean"
                         }
                     }
                 }

@@ -3,32 +3,44 @@ package v1
 import (
 	"Helloc/models"
 	db "Helloc/models/utils"
-	. "Helloc/utils"
+	"Helloc/utils"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"strconv"
 )
 
+type AddUserParam struct {
+	Account string `json:"account" binding:"required" example:"小明"`
+	Nickname string `json:"nickname" binding:"required" example:"xiaom"`
+	Password string `json:"password" binding:"required" example:"123456"`
+	Email string `json:"email" example:""`
+	Phone string `json:"phone" example:""`
+	IsAdmin bool `json:"isAdmin" example:"false"`
+}
+
+
 // @Summary 新增用户
 // @Description 只有管理员可以添加用户
 // @Tags 用户
 // @Accept json
-// @Param body body string true "account(*账号), passowrd(*密码) " default({"nickname": "小明", "account": "xiaom", "password": "123456", "email": "", "phone": "", "isAdmin": false, "photoFile":""})
-// @Success 200 {string} json "{"message":"创建用户完成!","results":{"id":1,"nickname":"小明","account":"xiaoming","password":"123456","email":"","phone":"","isAdmin":false,"photoFile":"","createdTime":""}}}"
-// @Failure 400 {string} json "{"msg": "参数错误/用户已存在，创建失败!", "results": null}"
+// @Param Body body AddUserParam true "desc"
+// @Success 200 {object} utils.ResponseStruct
+// @Failure 400 {object} utils.ResponseStruct
 // @Router /users/ [post]
 func AddUser(ctx *gin.Context) {
-	u := new(models.User)
+	u := new(AddUserParam)
 	err := ctx.ShouldBindJSON(u)
 	if err != nil {
-		HttpBadRequest(ctx, "参数错误!", nil)
+		utils.HttpBadRequest(ctx, "参数错误!", nil)
 		return
 	}
+	nu := new(models.User)
+	db.Move(u, nu, []string{})
 	if ok := db.New(u); ok {
-		HttpOk(ctx, "创建用户完成!", u)
+		utils.HttpOk(ctx, "创建用户完成!", u)
 
 	} else {
-		HttpBadRequest(ctx, "用户已存在，创建失败!", nil)
+		utils.HttpBadRequest(ctx, "创建失败，用户已存在!", nil)
 	}
 }
 
@@ -44,13 +56,13 @@ func DeleteUser(ctx *gin.Context) {
 	sid := ctx.Param("id")
 	id, err := strconv.Atoi(sid)
 	if err != nil {
-		HttpBadRequest(ctx, "参数错误!", nil)
+		utils.HttpBadRequest(ctx, "参数错误!", nil)
 		return
 	}
 	if db.Delete("user", id) {
-		HttpOk(ctx, "删除完成！", nil)
+		utils.HttpOk(ctx, "删除完成！", nil)
 	}else{
-		HttpBadRequest(ctx, "删除失败！", nil)
+		utils.HttpBadRequest(ctx, "删除失败！", nil)
 	}
 }
 
@@ -67,12 +79,12 @@ func ModifyUser(ctx *gin.Context) {
 	sid := ctx.Param("id")
 	id, err := strconv.Atoi(sid)
 	if err != nil {
-		HttpBadRequest(ctx, "参数错误!", nil)
+		utils.HttpBadRequest(ctx, "参数错误!", nil)
 		return
 	}
 	u := new(models.User)
 	if err = ctx.ShouldBindJSON(u); err!=nil{
-		HttpBadRequest(ctx, "参数错误!", nil)
+		utils.HttpBadRequest(ctx, "参数错误!", nil)
 		return
 	}
 	GetSql := fmt.Sprintf("select * from user where id=%d", id)
@@ -81,12 +93,12 @@ func ModifyUser(ctx *gin.Context) {
 		// 只允许修改NickName, Password, Email, Phone
 		user.NickName, user.Password, user.Email, user.Phone = u.NickName, u.Password, u.Email, u.Phone
 		if db.Modify(user){
-			HttpOk(ctx, "成功修改用户!", u)
+			utils.HttpOk(ctx, "成功修改用户!", u)
 		}else{
-			HttpBadRequest(ctx, "用户修改失败!", nil)
+			utils.HttpBadRequest(ctx, "用户修改失败!", nil)
 		}
 	}else{
-		HttpBadRequest(ctx, "用户不存在!", nil)
+		utils.HttpBadRequest(ctx, "用户不存在!", nil)
 	}
 }
 
@@ -102,15 +114,15 @@ func GetUser(ctx *gin.Context) {
 	sid := ctx.Param("id")
 	id, err := strconv.Atoi(sid)
 	if err != nil {
-		HttpBadRequest(ctx, "参数错误!", nil)
+		utils.HttpBadRequest(ctx, "参数错误!", nil)
 		return
 	}
 	u := new(models.User)
 	GetSql := fmt.Sprintf("select * from user where id=%d", id)
 	if db.Get(u, GetSql){
-		HttpOk(ctx, "成功获取用户!", u)
+		utils.HttpOk(ctx, "成功获取用户!", u)
 	}else{
-		HttpBadRequest(ctx, "用户不存在!", nil)
+		utils.HttpBadRequest(ctx, "用户不存在!", nil)
 	}
 }
 
@@ -130,7 +142,7 @@ func GetUsers(ctx *gin.Context) {
 	page, err1 := strconv.Atoi(pageParam)
 	size, err2 := strconv.Atoi(sizeParam)
 	if err1 != nil || err2 != nil {
-		HttpBadRequest(ctx, "参数错误!", nil)
+		utils.HttpBadRequest(ctx, "参数错误!", nil)
 		return
 	}
 	selectSql := "select * from user"
@@ -142,8 +154,8 @@ func GetUsers(ctx *gin.Context) {
 	}
 	var users []models.User
 	if db.Select(&users, selectSql){
-		HttpOk(ctx, "成功获取用户列表!", users)
+		utils.HttpOk(ctx, "成功获取用户列表!", users)
 	}else{
-		HttpBadRequest(ctx, "获取用户列表失败!", nil)
+		utils.HttpBadRequest(ctx, "获取用户列表失败!", nil)
 	}
 }

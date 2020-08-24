@@ -125,3 +125,18 @@ func modelToItems(i interface{}) (tableName string, fields []string, values []st
 	}
 	return
 }
+
+func Move(objParam interface{}, objModel interface{}, fields []string){
+	// 默认都是指针对象
+	// 将 objParam　结构体的参数，取指定fields字段　赋予 objModel
+	objPv := reflect.ValueOf(objParam)
+	if objPv.Kind() == reflect.Ptr{
+		objPv = objPv.Elem()
+	}
+	objMv := reflect.ValueOf(objModel).Elem()
+	for _, field := range fields{
+		v1 := objPv.FieldByName(field)
+		v2 := objMv.FieldByName(field)
+		v2.Set(v1)
+	}
+}

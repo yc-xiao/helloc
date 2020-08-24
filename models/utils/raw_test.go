@@ -126,3 +126,19 @@ func TestSelect(t *testing.T) {
 	}
 	fmt.Println(users)
 }
+
+func TestMove(t *testing.T) {
+	u1 := new(models.User)
+	u1.Id = 2
+	u1.IsAdmin = true
+	u1.Phone = "2333"
+	u1.NickName = "小米"
+	u2 := new(models.User)
+	fmt.Println(u1, u2)
+	ss := []string{"Id", "NickName", "IsAdmin"}
+	Move(u1, u2, ss)
+	fmt.Println(u2)
+	u3 := models.User{Id: 3}
+	Move(u3, u2, ss)
+	fmt.Println(u2)
+}

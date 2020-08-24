@@ -5,8 +5,8 @@ import (
 	"net/http"
 )
 
-type ResponseStruct struct {
-	Message string `json:"message"`
+type Response struct {
+	Message string `json:"message"` // 返回说明
 	Results interface{} `json:"results"`
 }
 

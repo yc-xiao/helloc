@@ -1,8 +1,39 @@
 basePath: /api/v1
 definitions:
-  utils.ResponseStruct:
+  models.User:
+    properties:
+      account:
+        description: 账号
+        type: string
+      createdTime:
+        description: 创建时间
+        type: string
+      email:
+        description: 邮箱
+        type: string
+      id:
+        description: 用户id
+        type: integer
+      isAdmin:
+        description: 是否是管理员
+        type: boolean
+      nickname:
+        description: 名称
+        type: string
+      password:
+        description: 密码
+        type: string
+      phone:
+        description: 手机
+        type: string
+      photoFile:
+        description: 用户头像
+        type: string
+    type: object
+  utils.Response:
     properties:
       message:
+        description: 返回说明
         type: string
       results:
         type: object
@@ -10,31 +41,95 @@ definitions:
   v1.AddUserParam:
     properties:
       account:
-        example: "1"
+        description: 账号
+        example: xiaom
         type: string
+      createdTime:
+        description: 创建时间
+        example: ' '
+        type: string
+      email:
+        description: 邮箱
+        example: ' '
+        type: string
+      isAdmin:
+        description: 是否是管理员
+        example: false
+        type: boolean
       nickname:
-        example: "2"
+        description: 名称
+        example: 小明
+        type: string
+      password:
+        description: 密码
+        example: "123456"
+        type: string
+      phone:
+        description: 手机
+        example: ' '
+        type: string
+      photoFile:
+        description: 用户头像
+        example: ' '
         type: string
     required:
     - account
     - nickname
+    - password
     type: object
-  v1.Utest:
+  v1.ModifyUserParam:
     properties:
-      body:
-        properties:
-          code:
-            description: 'Required: true'
-            type: string
-          data:
-            description: An optional field name to which this validation applies
-            type: object
-          msg:
-            description: 'Required: true'
-            type: string
-          status:
-            description: 'Required: true'
-            type: boolean
+      email:
+        description: 邮箱
+        example: ' '
+        type: string
+      nickname:
+        description: 名称
+        example: xiaom
+        type: string
+      password:
+        description: 密码
+        example: "123456"
+        type: string
+      phone:
+        description: 手机
+        example: ' '
+        type: string
+    required:
+    - nickname
+    - password
+    type: object
+  v1.TParam:
+    properties:
+      a:
+        description: 字符串a
+        example: a
+        type: string
+      b:
+        description: 数字b
+        example: 2
+        type: integer
+      c:
+        description: 布尔c
+        example: false
+        type: boolean
+    required:
+    - a
+    type: object
+  v1.TResponse:
+    properties:
+      message:
+        description: 成功返回说明
+        type: string
+      results:
+        type: object
+    type: object
+  v1.TResponse2:
+    properties:
+      message:
+        description: 错误返回说明
+        type: string
+      results:
         type: object
     type: object
 host: 127.0.0.1:9995
@@ -127,26 +222,30 @@ paths:
     post:
       consumes:
       - application/json
-      description: 只有管理员可以添加用户
+      description: 描述
       parameters:
-      - description: Utest
+      - description: desc
         in: body
         name: body
-        required: true
         schema:
-          $ref: '#/definitions/v1.Utest'
+          $ref: '#/definitions/v1.TParam'
       responses:
         "200":
-          description: '{"msg":"创建用户完成!","results":{"id":1,"nickname":"小明","account":"xiaoming","password":"123456","email":"","phone":"","isAdmin":false,"photoFile":"","createdTime":""}}}'
+          description: OK
           schema:
-            $ref: '#/definitions/utils.ResponseStruct'
+            allOf:
+            - $ref: '#/definitions/v1.TResponse'
+            - properties:
+                results:
+                  $ref: '#/definitions/v1.TParam'
+              type: object
         "400":
-          description: '{"msg": "参数错误/用户已存在，创建失败!", "results": null}'
+          description: Bad Request
           schema:
-            $ref: '#/definitions/utils.ResponseStruct'
-      summary: 新增用户
+            $ref: '#/definitions/v1.TResponse2'
+      summary: 接口测试
       tags:
-      - test
+      - 测试
   /users/:
     get:
       consumes:
@@ -178,7 +277,7 @@ paths:
       - application/json
       description: 只有管理员可以添加用户
       parameters:
-      - description: ??
+      - description: desc
         in: body
         name: Body
         required: true
@@ -186,18 +285,18 @@ paths:
           $ref: '#/definitions/v1.AddUserParam'
       responses:
         "200":
-          description: 返回参数
+          description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/utils.ResponseStruct'
+            - $ref: '#/definitions/utils.Response'
             - properties:
                 results:
-                  $ref: '#/definitions/v1.AddUserParam'
+                  $ref: '#/definitions/models.User'
               type: object
         "400":
-          description: '{"message": "参数错误/用户已存在，创建失败!", "results": null}'
+          description: Bad Request
           schema:
-            $ref: '#/definitions/utils.ResponseStruct'
+            $ref: '#/definitions/utils.Response'
       summary: 新增用户
       tags:
       - 用户
@@ -218,7 +317,7 @@ paths:
           schema:
             type: string
         "400":
-          description: '{"msg": "参数错误/删除失败!", "results": null}'
+          description: '{"message": "参数错误/删除失败!", "results": null}'
           schema:
             type: string
       summary: 删除用户
@@ -257,13 +356,12 @@ paths:
         name: id
         required: true
         type: string
-      - default: '{"nickname": "小明", "password": "123456", "email": "", "phone": ""}'
-        description: 用户信息
+      - description: desc
         in: body
         name: body
         required: true
         schema:
-          type: string
+          $ref: '#/definitions/v1.ModifyUserParam'
       responses:
         "200":
           description: '{"message":"成功修改用户!","results":{"id":1,"nickname":"小明","account":"xiaoming","password":"123456","email":"","phone":"","isAdmin":false,"photoFile":"","createdTime":""}}}'
@@ -274,6 +372,34 @@ paths:
           schema:
             type: string
       summary: 修改用户
+      tags:
+      - 用户
+  /users/{id}/photo/:
+    put:
+      consumes:
+      - application/json
+      description: 只有管理员/或用户自己可以修改
+      parameters:
+      - description: 用户id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 头像
+        in: formData
+        name: photoFile
+        required: true
+        type: file
+      responses:
+        "200":
+          description: '{"message":"成功上传用户头像!","results":[{"id":1,"nickname":"小明","account":"xiaoming","password":"123456","email":"","phone":"","isAdmin":false,"photoFile":"","createdTime":""}}]}'
+          schema:
+            type: string
+        "400":
+          description: '{"msg": "参数错误/头像上传失败!", "results": null}'
+          schema:
+            type: string
+      summary: 上传用户头像
       tags:
       - 用户
   /videos/:

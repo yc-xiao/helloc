@@ -26,9 +26,9 @@ func AddRouters(r *gin.Engine) {
 		{
 			u.POST("", middlewares.IsAdmin(), v.AddUser)
 			u.DELETE(":id", middlewares.IsAdmin(), v.DeleteUser)
-			u.PUT(":id", middlewares.OwnerOrAdmin(),v.ModifyUser)
+			u.PUT(":id", middlewares.OwnerOrAdmin(), v.ModifyUser)
 			u.GET(":id", v.GetUser)
-			//u.GET("", v.GetUsers)
+			u.PUT(":id/photo", middlewares.OwnerOrAdmin(), v.UploadPhoto)
 		}
 	}
 	// 视频
@@ -54,6 +54,7 @@ func AddRouters(r *gin.Engine) {
 		t.Use(middlewares.TestMiddleWare1())
 		t.Use(middlewares.TestMiddleWare3)
 		t.GET("", v.Test, middlewares.TestMiddleWare2())
+		t.POST("", v.Test, middlewares.TestMiddleWare2())
 		// t.Use(middlewares.TestMiddleWare3) 无法在最后添加
 	}
 }

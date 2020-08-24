@@ -133,10 +133,23 @@ func Move(objParam interface{}, objModel interface{}, fields []string){
 	if objPv.Kind() == reflect.Ptr{
 		objPv = objPv.Elem()
 	}
+
 	objMv := reflect.ValueOf(objModel).Elem()
+	if len(fields) == 0{
+		objPt := objPv.Type()
+		for i:=0; i< objPt.NumField(); i++{
+			f := objPt.Field(i)
+
+			fields = append(fields, f.Name)
+		}
+	}
+	fmt.Println(fields)
 	for _, field := range fields{
+		fmt.Println(field)
 		v1 := objPv.FieldByName(field)
 		v2 := objMv.FieldByName(field)
+		fmt.Println(v1,v2)
 		v2.Set(v1)
 	}
+	fmt.Println(objModel)
 }

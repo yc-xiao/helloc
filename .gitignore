@@ -2,3 +2,5 @@
 *.log
 go.mod
 go.sum
+static/images
+static/videos

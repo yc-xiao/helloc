@@ -77,6 +77,33 @@ definitions:
     - nickname
     - password
     type: object
+  v1.AddVideoParam:
+    properties:
+      category:
+        description: 视频类型
+        type: string
+      desc:
+        description: 描述
+        type: string
+      duration:
+        description: 视频时长
+        type: string
+      label:
+        description: 视频标签，多个自定义标签
+        type: string
+      rm:
+        description: 视频格式(mp4,flv)
+        type: string
+      title:
+        description: 标题
+        type: string
+      userId:
+        description: 视频上传用户
+        type: integer
+    required:
+    - title
+    - userId
+    type: object
   v1.ModifyUserParam:
     properties:
       email:
@@ -92,12 +119,35 @@ definitions:
         example: "123456"
         type: string
       phone:
-        description: 手机
-        example: ' '
+        description: 头像
+        example: /static/images/1/1.png
         type: string
     required:
     - nickname
     - password
+    type: object
+  v1.ModifyVideoParam:
+    properties:
+      category:
+        description: 视频类型
+        type: string
+      desc:
+        description: 描述
+        type: string
+      duration:
+        description: 视频时长
+        type: string
+      label:
+        description: 视频标签，多个自定义标签
+        type: string
+      rm:
+        description: 视频格式(mp4,flv)
+        type: string
+      title:
+        description: 标题
+        type: string
+    required:
+    - title
     type: object
   v1.TParam:
     properties:
@@ -140,41 +190,13 @@ info:
   title: HelloC API (Swagger Example)
   version: "1.0"
 paths:
-  /{id}/upload/:
-    post:
-      consumes:
-      - application/json
-      description: 管理员
-      parameters:
-      - description: 视频id
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: 是否通过
-        in: formData
-        name: pass
-        required: true
-        type: boolean
-      responses:
-        "200":
-          description: '{"message":"视频审核完成", "results":null}'
-          schema:
-            type: string
-        "400":
-          description: '{"msg": "视频审核失败!", "results": null}'
-          schema:
-            type: string
-      summary: 审核视频
-      tags:
-      - 视频
   /auth/:
     post:
       consumes:
       - application/json
       description: 通过JWT验证账号密码，获取token
       parameters:
-      - default: '{"name": "xiaoming", "password": "123456"}'
+      - default: '{"name": "admin", "password": "123456"}'
         description: name(*用户名) password(*密码)
         in: body
         name: body
@@ -199,7 +221,7 @@ paths:
       - application/json
       description: 用于Swagger，只做测试
       parameters:
-      - default: '{"name": "xiaoming", "password": "123456"}'
+      - default: '{"name": "admin", "password": "123456"}'
         description: name(*用户名) password(*密码)
         in: body
         name: body
@@ -377,7 +399,7 @@ paths:
   /users/{id}/photo/:
     put:
       consumes:
-      - application/json
+      - multipart/form-data
       description: 只有管理员/或用户自己可以修改
       parameters:
       - description: 用户id
@@ -433,20 +455,19 @@ paths:
       - application/json
       description: 普通用户可上传
       parameters:
-      - default: '{"title": "小明大战小黄", "desc": "test", "category": "电影", "label": "小明，小黄，动作，武打", "rm": "mp4"}'
-        description: title(*标题)
+      - description: desc
         in: body
-        name: body
+        name: Body
         required: true
         schema:
-          type: string
+          $ref: '#/definitions/v1.AddVideoParam'
       responses:
         "200":
-          description: '{"message":"创建视频完成!","results":{"id":1,"nickname":"小明","account":"xiaoming","password":"123456","email":"","phone":"","isAdmin":false,"photoFile":"","createdTime":""}}}'
+          description: '{"message":"创建视频完成!","results":videoObject}'
           schema:
             type: string
         "400":
-          description: '{"msg": "参数错误/创建失败!", "results": null}'
+          description: '{"message": "参数错误/创建失败!", "results": null}'
           schema:
             type: string
       summary: 上传视频信息
@@ -469,7 +490,7 @@ paths:
           schema:
             type: string
         "400":
-          description: '{"msg": "参数错误/删除失败!", "results": null}'
+          description: '{"message": "参数错误/删除失败!", "results": null}'
           schema:
             type: string
       summary: 删除视频
@@ -501,30 +522,82 @@ paths:
       - application/json
       description: 只有管理员/或用户自己可以修改视频信息
       parameters:
-      - default: '{"title": "小明大战小黄", "desc": "test", "category": "电影", "label": "小明，小黄，动作，武打", "rm": "mp4"}'
-        description: title(*标题)
+      - description: 视频id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: desc
         in: body
-        name: body
+        name: Body
         required: true
         schema:
-          type: string
-      - default: '{"nickname": "小明", "account": "xiaoming", "password": "123456", "email": "", "phone": ""}'
-        description: 用户信息
-        in: body
-        name: body
-        required: true
-        schema:
-          type: string
+          $ref: '#/definitions/v1.ModifyVideoParam'
       responses:
         "200":
-          description: '{"message":"成功修改用户!","results":{"id":1,"nickname":"小明","account":"xiaoming","password":"123456","email":"","phone":"","isAdmin":false,"photoFile":"","createdTime":""}}}'
+          description: '{"message":"成功修改用户!", "results": videoObject}'
           schema:
             type: string
         "400":
-          description: '{"msg": "参数错误/用户不存在!/用户修改失败!", "results": null}'
+          description: '{"message": "参数错误", "results": null}'
           schema:
             type: string
       summary: 修改视频
+      tags:
+      - 视频
+  /videos/{id}/check/:
+    post:
+      consumes:
+      - multipart/form-data
+      description: 管理员
+      parameters:
+      - description: 视频id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 是否通过
+        in: formData
+        name: pass
+        required: true
+        type: boolean
+      responses:
+        "200":
+          description: '{"message":"视频审核完成", "results":null}'
+          schema:
+            type: string
+        "400":
+          description: '{"msg": "视频审核失败!", "results": null}'
+          schema:
+            type: string
+      summary: 审核视频
+      tags:
+      - 视频
+  /videos/{id}/upload/:
+    post:
+      consumes:
+      - multipart/form-data
+      description: 管理员或用户
+      parameters:
+      - description: 视频id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 视频文件
+        in: formData
+        name: videoFile
+        type: file
+      responses:
+        "200":
+          description: '{"message":"成功上传视频文件!文件地址:url!","results":null}'
+          schema:
+            type: string
+        "400":
+          description: '{"msg": "参数错误/视频不存在!/成功上传视频文件!但视频信息修改失败!", "results": null}'
+          schema:
+            type: string
+      summary: 上传视频文件
       tags:
       - 视频
 swagger: "2.0"

@@ -108,7 +108,7 @@ func modelToItems(i interface{}) (tableName string, fields []string, values []st
 	fields, values = make([]string, l), make([]string, l)
 	for i:=0; i<l; i++ {
 		tf, vf := tElem.Field(i), vElem.Field(i)
-		fields[i] = tf.Tag.Get("db")
+		fields[i] = "`" + tf.Tag.Get("db") + "`"
 		// 临时处理
 		switch tf.Type.String() {
 		case "int":

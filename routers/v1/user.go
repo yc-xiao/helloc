@@ -175,7 +175,7 @@ func GetUsers(ctx *gin.Context) {
 // @Summary 上传用户头像
 // @Description 只有管理员/或用户自己可以修改
 // @Tags 用户
-// @Accept json
+// @Accept mpfd
 // @Param id path string true "用户id"
 // @Param photoFile formData file true "头像"
 // @Success 200 {string} json "{"message":"成功上传用户头像!","results":[{"id":1,"nickname":"小明","account":"xiaoming","password":"123456","email":"","phone":"","isAdmin":false,"photoFile":"","createdTime":""}}]}"

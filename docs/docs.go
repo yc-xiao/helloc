@@ -37,7 +37,7 @@ var doc = `{
                 "summary": "登录认证",
                 "parameters": [
                     {
-                        "default": "{\"name\": \"xiaoming\", \"password\": \"123456\"}",
+                        "default": "{\"name\": \"admin\", \"password\": \"123456\"}",
                         "description": "name(*用户名) password(*密码)",
                         "name": "body",
                         "in": "body",
@@ -75,7 +75,7 @@ var doc = `{
                 "summary": "登录认证2，用于Swagger，只做测试",
                 "parameters": [
                     {
-                        "default": "{\"name\": \"xiaoming\", \"password\": \"123456\"}",
+                        "default": "{\"name\": \"admin\", \"password\": \"123456\"}",
                         "description": "name(*用户名) password(*密码)",
                         "name": "body",
                         "in": "body",
@@ -351,7 +351,7 @@ var doc = `{
             "put": {
                 "description": "只有管理员/或用户自己可以修改",
                 "consumes": [
-                    "application/json"
+                    "multipart/form-data"
                 ],
                 "tags": [
                     "用户"
@@ -439,25 +439,24 @@ var doc = `{
                 "summary": "上传视频信息",
                 "parameters": [
                     {
-                        "default": "{\"title\": \"小明大战小黄\", \"desc\": \"test\", \"category\": \"电影\", \"label\": \"小明，小黄，动作，武打\", \"rm\": \"mp4\"}",
-                        "description": "title(*标题)",
-                        "name": "body",
+                        "description": "desc",
+                        "name": "Body",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/v1.AddVideoParam"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "{\"message\":\"创建视频完成!\",\"results\":{\"id\":1,\"nickname\":\"小明\",\"account\":\"xiaoming\",\"password\":\"123456\",\"email\":\"\",\"phone\":\"\",\"isAdmin\":false,\"photoFile\":\"\",\"createdTime\":\"\"}}}",
+                        "description": "{\"message\":\"创建视频完成!\",\"results\":videoObject}",
                         "schema": {
                             "type": "string"
                         }
                     },
                     "400": {
-                        "description": "{\"msg\": \"参数错误/创建失败!\", \"results\": null}",
+                        "description": "{\"message\": \"参数错误/创建失败!\", \"results\": null}",
                         "schema": {
                             "type": "string"
                         }
@@ -509,35 +508,31 @@ var doc = `{
                 "summary": "修改视频",
                 "parameters": [
                     {
-                        "default": "{\"title\": \"小明大战小黄\", \"desc\": \"test\", \"category\": \"电影\", \"label\": \"小明，小黄，动作，武打\", \"rm\": \"mp4\"}",
-                        "description": "title(*标题)",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
+                        "type": "string",
+                        "description": "视频id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
                     },
                     {
-                        "default": "{\"nickname\": \"小明\", \"account\": \"xiaoming\", \"password\": \"123456\", \"email\": \"\", \"phone\": \"\"}",
-                        "description": "用户信息",
-                        "name": "body",
+                        "description": "desc",
+                        "name": "Body",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/v1.ModifyVideoParam"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "{\"message\":\"成功修改用户!\",\"results\":{\"id\":1,\"nickname\":\"小明\",\"account\":\"xiaoming\",\"password\":\"123456\",\"email\":\"\",\"phone\":\"\",\"isAdmin\":false,\"photoFile\":\"\",\"createdTime\":\"\"}}}",
+                        "description": "{\"message\":\"成功修改用户!\", \"results\": videoObject}",
                         "schema": {
                             "type": "string"
                         }
                     },
                     "400": {
-                        "description": "{\"msg\": \"参数错误/用户不存在!/用户修改失败!\", \"results\": null}",
+                        "description": "{\"message\": \"参数错误\", \"results\": null}",
                         "schema": {
                             "type": "string"
                         }
@@ -570,7 +565,7 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "{\"msg\": \"参数错误/删除失败!\", \"results\": null}",
+                        "description": "{\"message\": \"参数错误/删除失败!\", \"results\": null}",
                         "schema": {
                             "type": "string"
                         }
@@ -578,11 +573,11 @@ var doc = `{
                 }
             }
         },
-        "/{id}/upload/": {
+        "/videos/{id}/check/": {
             "post": {
                 "description": "管理员",
                 "consumes": [
-                    "application/json"
+                    "multipart/form-data"
                 ],
                 "tags": [
                     "视频"
@@ -613,6 +608,47 @@ var doc = `{
                     },
                     "400": {
                         "description": "{\"msg\": \"视频审核失败!\", \"results\": null}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/videos/{id}/upload/": {
+            "post": {
+                "description": "管理员或用户",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "tags": [
+                    "视频"
+                ],
+                "summary": "上传视频文件",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "视频id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "视频文件",
+                        "name": "videoFile",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"message\":\"成功上传视频文件!文件地址:url!\",\"results\":null}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "{\"msg\": \"参数错误/视频不存在!/成功上传视频文件!但视频信息修改失败!\", \"results\": null}",
                         "schema": {
                             "type": "string"
                         }
@@ -725,6 +761,43 @@ var doc = `{
                 }
             }
         },
+        "v1.AddVideoParam": {
+            "type": "object",
+            "required": [
+                "title",
+                "userId"
+            ],
+            "properties": {
+                "category": {
+                    "description": "视频类型",
+                    "type": "string"
+                },
+                "desc": {
+                    "description": "描述",
+                    "type": "string"
+                },
+                "duration": {
+                    "description": "视频时长",
+                    "type": "string"
+                },
+                "label": {
+                    "description": "视频标签，多个自定义标签",
+                    "type": "string"
+                },
+                "rm": {
+                    "description": "视频格式(mp4,flv)",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "标题",
+                    "type": "string"
+                },
+                "userId": {
+                    "description": "视频上传用户",
+                    "type": "integer"
+                }
+            }
+        },
         "v1.ModifyUserParam": {
             "type": "object",
             "required": [
@@ -748,9 +821,41 @@ var doc = `{
                     "example": "123456"
                 },
                 "phone": {
-                    "description": "手机",
+                    "description": "头像",
                     "type": "string",
-                    "example": " "
+                    "example": "/static/images/1/1.png"
+                }
+            }
+        },
+        "v1.ModifyVideoParam": {
+            "type": "object",
+            "required": [
+                "title"
+            ],
+            "properties": {
+                "category": {
+                    "description": "视频类型",
+                    "type": "string"
+                },
+                "desc": {
+                    "description": "描述",
+                    "type": "string"
+                },
+                "duration": {
+                    "description": "视频时长",
+                    "type": "string"
+                },
+                "label": {
+                    "description": "视频标签，多个自定义标签",
+                    "type": "string"
+                },
+                "rm": {
+                    "description": "视频格式(mp4,flv)",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "标题",
+                    "type": "string"
                 }
             }
         },

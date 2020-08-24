@@ -26,3 +26,4 @@ func ClearUserStorageSpace(sid string) {
 	os.RemoveAll(videoPath)
 	os.RemoveAll(imagePath)
 }
+

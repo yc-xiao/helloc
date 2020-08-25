@@ -1,5 +1,6 @@
 .idea
 *.log
+task.txt
 confs/private.ini
 go.mod
 go.sum

@@ -5,6 +5,7 @@ import (
 	_ "Helloc/docs"
 	"Helloc/models/utils"
 	"Helloc/routers"
+	"Helloc/tasks"
 	"github.com/gin-gonic/gin"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
@@ -23,6 +24,8 @@ func main() {
 	defer f.Close()
 	defer utils.DB.Close()
 	defer utils.RedisClose()
+	defer tasks.Close()
+	go tasks.StartTasks()
 
 	gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
 	r := gin.Default()

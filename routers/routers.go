@@ -18,17 +18,24 @@ func AddRouters(r *gin.Engine) {
 		v1.POST("auth/", v.Auth)
 		v1.POST("auth2/", v.Auth2)
 	}
+	// 获取验证码
+	{
+		v1.GET("sendCodeByPhone/:phone/", v.SendCodeByPhone)
+	}
+
 	// 用户
 	{
 		u := v1.Group("users/")
 		u.GET("", v.GetUsers)
+		u.POST("", v.AddUser)
+
 		u.Use(middlewares.JwtCheckMiddleWare())
 		{
-			u.POST("", middlewares.IsAdmin(), v.AddUser)
 			u.DELETE(":id", middlewares.IsAdmin(), v.DeleteUser)
 			u.PUT(":id", middlewares.OwnerOrAdmin(), v.ModifyUser)
 			u.GET(":id", v.GetUser)
 			u.PUT(":id/photo", middlewares.OwnerOrAdmin(), v.UploadPhoto)
+			u.PUT(":id/bindPhone", middlewares.OwnerOrAdmin(), v.BindPhone)
 		}
 	}
 	// 视频

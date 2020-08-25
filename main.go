@@ -22,6 +22,7 @@ func main() {
 	f, _ := os.Create("HelloC.log")
 	defer f.Close()
 	defer utils.DB.Close()
+	defer utils.RedisClose()
 
 	gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
 	r := gin.Default()

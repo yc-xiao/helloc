@@ -20,11 +20,11 @@ type AddUserParam struct {
 	Phone string `json:"phone" example:" "` // 手机
 	IsAdmin bool `json:"isAdmin" example:"false"` // 是否是管理员
 	PhotoFile string `json:"photoFile" example:" "` // 用户头像
-	CreatedTime string `json:"createdTime" example:" "` // 创建时间
+	PhoneCode string `json:"phoneCode" example:" "` // 手机验证码
 }
 
 // @Summary 新增用户
-// @Description 只有管理员可以添加用户
+// @Description 可注册
 // @Tags 用户
 // @Accept json
 // @Param Body body AddUserParam true "desc"
@@ -37,6 +37,11 @@ func AddUser(ctx *gin.Context) {
 	if err != nil {
 		utils.HttpBadRequest(ctx, "参数错误!", nil)
 		return
+	}
+
+	// 处理手机验证码
+	if code, err := db.RGetString(u.Phone); err != nil || code != u.PhoneCode{
+		u.Phone = ""
 	}
 	nu := new(models.User)
 	db.Move(u, nu, []string{})
@@ -210,4 +215,49 @@ func UploadPhoto(ctx *gin.Context) {
 	}else{
 		utils.HttpBadRequest(ctx, "头像上传成功，但信息更新失败!", nil)
 	}
+}
+
+// @Summary 绑定手机
+// @Description 只有管理员/或用户自己可以修改
+// @Tags 用户
+// @Accept mpfd
+// @Param id path string true "用户id"
+// @Param code formData string true "验证码"
+// @Param phone formData string true "手机号"
+// @Success 200 {string} json "{"message":"成功绑定!", "results": null}"
+// @Failure 400 {string} json "{"msg": "参数错误", "results": null}"
+// @Router /users/{id}/bindPhone/ [put]
+func BindPhone(ctx *gin.Context){
+	code, ok1 := ctx.GetPostForm("code")
+	phone, ok2 := ctx.GetPostForm("phone")
+	if !ok1 || !ok2 {
+		utils.HttpBadRequest(ctx, "参数错误！", nil)
+		return
+	}
+	// 处理手机验证码
+	if code2, err := db.RGetString(phone); err != nil || code2 != code{
+		utils.HttpBadRequest(ctx, "验证码错误!", nil)
+		return
+	}
+
+	sid := ctx.Param("id")
+	id, err := strconv.Atoi(sid)
+	if err != nil {
+		utils.HttpBadRequest(ctx, "参数错误!", nil)
+		return
+	}
+	GetSql := fmt.Sprintf("select * from user where id=%d;", id)
+	user := new(models.User)
+	if db.Get(user, GetSql){
+		user.Phone = phone
+		fmt.Println(user)
+		if db.Modify(user, []string{"Phone"}){
+			utils.HttpOk(ctx, "成功修改用户!", user)
+		}else{
+			utils.HttpBadRequest(ctx, "用户修改失败!", nil)
+		}
+	}else{
+		utils.HttpBadRequest(ctx, "用户不存在!", nil)
+	}
+
 }

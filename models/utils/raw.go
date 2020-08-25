@@ -11,6 +11,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var DB *sqlx.DB
@@ -32,9 +33,25 @@ func init() {
 }
 
 func New(i interface{}) bool {
-	tableName, fields, values := modelToItems(i, []string{})
-	fieldString := strings.Join(fields[1:], ",")
-	valueString := strings.Join(values[1:], ",")
+	tableName, AttrToValue := modelToItems(i, []string{})
+	ll := len(AttrToValue)
+	fields, values := make([]string, ll-1), make([]string, ll-1)
+
+	j := 0
+	for field, value := range AttrToValue {
+		if field == "`id`" {
+			continue
+		}
+		if field == "`createdTime`" {
+			value = `"` + time.Now().Format("2006-01-02 15:04:05") + `"`
+		}
+		fields[j] = field
+		values[j] = value
+		j++
+	}
+
+	fieldString := strings.Join(fields, ",")
+	valueString := strings.Join(values, ",")
 	newSql := fmt.Sprintf("insert into `%s` (%s) values (%s);", tableName, fieldString, valueString)
 	_, err := DB.Exec(newSql)
 	log.Println(newSql)
@@ -58,13 +75,21 @@ func Delete(table string, id int) bool {
 
 func Modify(i interface{}, partFields []string) bool {
 	// partFields 指定字段修改
-	tableName, fields, values := modelToItems(i, partFields)
-	l := len(values)
-	ss := make([]string, l, l)
-	for i:=0; i<l; i++ {
-		ss[i] = fmt.Sprintf("%s=%s", fields[i], values[i])
+	tableName, AttrToValue := modelToItems(i, partFields)
+	fmt.Println(partFields, AttrToValue)
+	ss := make([]string, len(AttrToValue)-1)
+	id, _ := AttrToValue["`id`"]
+
+	j := 0
+	for attr, value := range AttrToValue {
+		if attr == "`id`" {
+			continue
+		}
+		ss[j] = fmt.Sprintf("%s=%s", attr, value)
+		j++
 	}
-	UpdateSql := fmt.Sprintf("update `%s` set %s where id=%s;", tableName, strings.Join(ss[1:], ","), values[0])
+
+	UpdateSql := fmt.Sprintf("update `%s` set %s where id=%s;", tableName, strings.Join(ss, ","), id)
 	_, err := DB.Exec(UpdateSql)
 	log.Println(UpdateSql)
 	if err != nil {
@@ -92,7 +117,7 @@ func Select(objs interface{}, sql string) bool{
 	return true
 }
 
-func modelToItems(i interface{}, partFields []string) (tableName string, fields []string, values []string){
+func modelToItems(i interface{}, partFields []string) (tableName string, AttrToValue map[string]string){
 	t := reflect.TypeOf(i)
 	v := reflect.ValueOf(i)
 	if t.Kind() != reflect.Ptr {
@@ -105,41 +130,38 @@ func modelToItems(i interface{}, partFields []string) (tableName string, fields 
 		utils.ErrorBreak(fmt.Errorf(" %s　表不存在!", vElem.Type()), "")
 	}
 	tableName = tableName2
-	l := tElem.NumField()
 
 	dic := make(map[string]bool)
 	l2 := len(partFields)
 	if l2 != 0 {
-		l = l2
 		for _, v := range partFields{
 			dic[v] = true
 		}
 		if !dic["Id"] {
 			dic["Id"] = true
-			l++
 		}
 	}
 
-	fields, values = make([]string, l), make([]string, l)
-	for i:=0; i<l; i++ {
+	AttrToValue = make(map[string]string)
+	var value string
+	for i:=0; i<tElem.NumField(); i++ {
 		tf, vf := tElem.Field(i), vElem.Field(i)
 		if l2 != 0 && !dic[tf.Name] {
 			continue
 		}
-		fields[i] = "`" + tf.Tag.Get("db") + "`"
-		// 临时处理
 		switch tf.Type.String() {
 		case "int":
-			values[i] = strconv.Itoa(int(vf.Int()))
+			value = strconv.Itoa(int(vf.Int()))
 		case "bool":
 			if vf.Bool(){
-				values[i] = "1"
+				value = "1"
 			}else{
-				values[i] = "0"
+				value = "0"
 			}
 		default:
-			values[i] = fmt.Sprintf(`"%s"`, vf.String())
+			value = fmt.Sprintf(`"%s"`, vf.String())
 		}
+		AttrToValue["`" + tf.Tag.Get("db") + "`"] = value
 	}
 	return
 }
@@ -161,14 +183,17 @@ func Move(objParam interface{}, objModel interface{}, fields []string) []string{
 			fields = append(fields, f.Name)
 		}
 	}
-	fmt.Println(fields)
+	//fmt.Println(fields)
 	for _, field := range fields{
-		fmt.Println(field)
+		//fmt.Println(field)
 		v1 := objPv.FieldByName(field)
 		v2 := objMv.FieldByName(field)
-		fmt.Println(v1,v2)
+
+		if !v2.CanSet(){
+			continue
+		}
 		v2.Set(v1)
 	}
-	fmt.Println(objModel)
+	//fmt.Println(objModel)
 	return fields
 }

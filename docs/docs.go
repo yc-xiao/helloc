@@ -189,7 +189,7 @@ var doc = `{
                 }
             },
             "post": {
-                "description": "只有管理员可以添加用户",
+                "description": "可注册",
                 "consumes": [
                     "application/json"
                 ],
@@ -340,6 +340,55 @@ var doc = `{
                     },
                     "400": {
                         "description": "{\"message\": \"参数错误/删除失败!\", \"results\": null}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{id}/bindPhone/": {
+            "put": {
+                "description": "只有管理员/或用户自己可以修改",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "tags": [
+                    "用户"
+                ],
+                "summary": "绑定手机",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "用户id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "验证码",
+                        "name": "code",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "手机号",
+                        "name": "phone",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"message\":\"成功绑定!\", \"results\": null}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "{\"msg\": \"参数错误\", \"results\": null}",
                         "schema": {
                             "type": "string"
                         }
@@ -724,11 +773,6 @@ var doc = `{
                     "type": "string",
                     "example": "xiaom"
                 },
-                "createdTime": {
-                    "description": "创建时间",
-                    "type": "string",
-                    "example": " "
-                },
                 "email": {
                     "description": "邮箱",
                     "type": "string",
@@ -751,6 +795,11 @@ var doc = `{
                 },
                 "phone": {
                     "description": "手机",
+                    "type": "string",
+                    "example": " "
+                },
+                "phoneCode": {
+                    "description": "手机验证码",
                     "type": "string",
                     "example": " "
                 },

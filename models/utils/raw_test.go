@@ -66,7 +66,7 @@ func TestNew(t *testing.T) {
 	funcName := "New"
 	u := models.User{
 		NickName: "小明",
-		Account: "小红",
+		Account: "小红3",
 		IsAdmin: true,
 		CreatedTime: "",
 	}
@@ -134,17 +134,29 @@ func TestSelect(t *testing.T) {
 }
 
 func TestMove(t *testing.T) {
-	u1 := new(models.User)
+	type User struct {
+		Id int `json:"id" db:"id"` // 用户id
+		NickName string `json:"nickname" db:"nickname"` //　名称
+		Account string `json:"account" db:"account"` // 账号
+		Password string `json:"password" db:"password"` //　密码
+		Email string `json:"email" db:"email"` // 邮箱
+		Phone string `json:"phone" db:"phone"` //　手机
+		IsAdmin bool `json:"isAdmin" db:"isAdmin"` // 是否是管理员
+		PhotoFile string `json:"photoFile" db:"photoFile"` // 用户头像
+		Code string `json:"code"` // code
+	}
+	u1 := new(User)
 	u1.Id = 2
 	u1.IsAdmin = true
 	u1.Phone = "2333"
 	u1.NickName = "小米"
+	u1.Code = "2333"
 	u2 := new(models.User)
 	fmt.Println(u1, u2)
-	ss := []string{"Id", "NickName", "IsAdmin"}
+	ss := []string{"Id", "NickName", "IsAdmin", "Code"}
 	Move(u1, u2, ss)
-	fmt.Println(u2)
+	fmt.Println(u1, u2)
 	u3 := models.User{Id: 3}
 	Move(u3, u2, ss)
-	fmt.Println(u2)
+	fmt.Println(u3, u2)
 }

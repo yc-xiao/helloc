@@ -1,5 +1,6 @@
 .idea
 *.log
+confs/private.ini
 go.mod
 go.sum
 static/images

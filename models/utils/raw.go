@@ -32,7 +32,7 @@ func init() {
 }
 
 func New(i interface{}) bool {
-	tableName, fields, values := modelToItems(i)
+	tableName, fields, values := modelToItems(i, []string{})
 	fieldString := strings.Join(fields[1:], ",")
 	valueString := strings.Join(values[1:], ",")
 	newSql := fmt.Sprintf("insert into `%s` (%s) values (%s);", tableName, fieldString, valueString)
@@ -56,8 +56,9 @@ func Delete(table string, id int) bool {
 	return true
 }
 
-func Modify(i interface{}) bool {
-	tableName, fields, values := modelToItems(i)
+func Modify(i interface{}, partFields []string) bool {
+	// partFields 指定字段修改
+	tableName, fields, values := modelToItems(i, partFields)
 	l := len(values)
 	ss := make([]string, l, l)
 	for i:=0; i<l; i++ {
@@ -91,7 +92,7 @@ func Select(objs interface{}, sql string) bool{
 	return true
 }
 
-func modelToItems(i interface{}) (tableName string, fields []string, values []string){
+func modelToItems(i interface{}, partFields []string) (tableName string, fields []string, values []string){
 	t := reflect.TypeOf(i)
 	v := reflect.ValueOf(i)
 	if t.Kind() != reflect.Ptr {
@@ -105,9 +106,26 @@ func modelToItems(i interface{}) (tableName string, fields []string, values []st
 	}
 	tableName = tableName2
 	l := tElem.NumField()
+
+	dic := make(map[string]bool)
+	l2 := len(partFields)
+	if l2 != 0 {
+		l = l2
+		for _, v := range partFields{
+			dic[v] = true
+		}
+		if !dic["Id"] {
+			dic["Id"] = true
+			l++
+		}
+	}
+
 	fields, values = make([]string, l), make([]string, l)
 	for i:=0; i<l; i++ {
 		tf, vf := tElem.Field(i), vElem.Field(i)
+		if l2 != 0 && !dic[tf.Name] {
+			continue
+		}
 		fields[i] = "`" + tf.Tag.Get("db") + "`"
 		// 临时处理
 		switch tf.Type.String() {
@@ -126,7 +144,7 @@ func modelToItems(i interface{}) (tableName string, fields []string, values []st
 	return
 }
 
-func Move(objParam interface{}, objModel interface{}, fields []string){
+func Move(objParam interface{}, objModel interface{}, fields []string) []string{
 	// 默认都是指针对象
 	// 将 objParam　结构体的参数，取指定fields字段　赋予 objModel
 	objPv := reflect.ValueOf(objParam)
@@ -152,4 +170,5 @@ func Move(objParam interface{}, objModel interface{}, fields []string){
 		v2.Set(v1)
 	}
 	fmt.Println(objModel)
+	return fields
 }

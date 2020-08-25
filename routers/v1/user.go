@@ -102,8 +102,8 @@ func ModifyUser(ctx *gin.Context) {
 	GetSql := fmt.Sprintf("select * from user where id=%d", id)
 	user := new(models.User)
 	if db.Get(user, GetSql){
-		db.Move(u, user, []string{})
-		if db.Modify(user){
+		fields := db.Move(u, user, []string{})
+		if db.Modify(user, fields){
 			utils.HttpOk(ctx, "成功修改用户!", user)
 		}else{
 			utils.HttpBadRequest(ctx, "用户修改失败!", nil)
@@ -205,7 +205,7 @@ func UploadPhoto(ctx *gin.Context) {
 		return
 	}
 	u.Phone = strings.Split(filePath, "Helloc")[1]
-	if db.Modify(u){
+	if db.Modify(u, []string{"Phone"}){
 		utils.HttpOk(ctx, "成功上传用户头像!", u)
 	}else{
 		utils.HttpBadRequest(ctx, "头像上传成功，但信息更新失败!", nil)

@@ -70,3 +70,18 @@ func OwnerOrAdminToVideo() (handlerFunc gin.HandlerFunc) {
 		log.Println("out OwnerOrAdminToVideo")
 	}
 }
+
+func OwnerOrAdminToComment() (handlerFunc gin.HandlerFunc) {
+	return func(ctx *gin.Context) {
+		log.Println("in OwnerOrAdminToComment")
+		u, _ := ctx.Get("user")
+		user, ok := u.(*utils.UserInfo)
+		getSql := fmt.Sprintf("select * from comment where id=%s and userId=%d", ctx.Param("id"), user.Id)
+		if ok && (user.IsAdmin || db.Get(new(models.Comment), getSql)){
+
+		}else{
+			utils.HttpBadRequest(ctx, "没有权限访问!", nil)
+		}
+		log.Println("out OwnerOrAdminToComment")
+	}
+}

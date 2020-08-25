@@ -53,5 +53,8 @@ create table if not exists `comment` (
     `objId` int not null,
     `model` varchar(255) not null,
     `context` text default "",
-    `createdTime` varchar(255) default ""
+    `createdTime` varchar(255) default "",
+    `originId` int not null,
+    `userId` int default 0,
+    foreign key(userId) references user(id)
 );

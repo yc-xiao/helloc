@@ -46,8 +46,15 @@ func AddRouters(r *gin.Engine) {
 			video.POST(":id/upload/", middlewares.OwnerOrAdminToVideo(), v.UploadVideo)
 			video.POST(":id/check/", middlewares.IsAdmin(), v.CheckVideo)
 		}
-
 	}
+	// 评论
+	{
+		comment := r.Group("comments/")
+		comment.GET(":id/")
+		comment.POST(":id/", middlewares.JwtCheckMiddleWare())
+		comment.DELETE(":id/", middlewares.OwnerOrAdminToComment())
+	}
+
 	// 测试
 	{
 		t := v1.Group("test/")

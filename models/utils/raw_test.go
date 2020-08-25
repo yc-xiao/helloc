@@ -90,13 +90,19 @@ func TestModify(t *testing.T) {
 	funcName := "New"
 	u := models.User{
 		NickName: "小明2",
-		Account: "xiaoming",
+		Account: "xiaoming2",
 		IsAdmin: false,
-		Password: "123456",
+		Password: "1234567",
 		CreatedTime: "",
 		Id: 1,
 	}
-	if Modify(&u) {
+	if Modify(&u, []string{"NickName", "Account", "Password"}) {
+		t.Logf("func %s is ok, Nice!!!!!!", funcName)
+	}else {
+		t.Errorf("func %s is fail, NO!!!!", funcName)
+	}
+
+	if Modify(&u, []string{}) {
 		t.Logf("func %s is ok, Nice!!!!!!", funcName)
 	}else {
 		t.Errorf("func %s is fail, NO!!!!", funcName)

@@ -104,8 +104,8 @@ func ModifyVideo(ctx *gin.Context) {
 	GetSql := fmt.Sprintf("select * from video where id=%d", id)
 	v2 := new(models.Video)
 	if db.Get(v2, GetSql){
-		db.Move(v, v2, []string{})
-		if db.Modify(v2){
+		fields := db.Move(v, v2, []string{})
+		if db.Modify(v2, fields){
 			utils.HttpOk(ctx, "成功修改视频信息!", v2)
 		}else{
 			utils.HttpBadRequest(ctx, "视频信息修改失败!", nil)
@@ -207,7 +207,7 @@ func UploadVideo(ctx *gin.Context) {
 		return
 	}
 	v.VideoFile = strings.Split(filePath, "Helloc")[1]
-	if db.Modify(v){
+	if db.Modify(v, []string{"VideoFile"}){
 		utils.HttpOk(ctx, "成功上传视频!", v)
 	}else{
 		utils.HttpBadRequest(ctx, "视频上传成功，但信息更新失败!", nil)
@@ -240,7 +240,7 @@ func CheckVideo(ctx *gin.Context) {
 			pass2 = true
 		}
 		video.Pass = pass2
-		if db.Modify(video){
+		if db.Modify(video, []string{"Pass"}){
 			utils.HttpOk(ctx, "视频审核完成!", nil)
 		}else {
 			utils.HttpBadRequest(ctx, "视频审核失败!", nil)

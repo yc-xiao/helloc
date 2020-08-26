@@ -24,4 +24,4 @@
     - 4.4 用户空间大小，视频上传大小
     - 4.5 直播
 5. PS
-    SQL注入
+    SQL注入 select % from table where id=%s; %s => 1 or 1=1;

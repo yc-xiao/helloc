@@ -13,8 +13,8 @@ var scheduler = gocron.NewScheduler()
 var sc chan bool
 
 func StartTasks() {
-	scheduler.Every(2).Second().Do(defaultPrintTask)
-	scheduler.Every(3).Second().Do(func (){
+	scheduler.Every(3600).Second().Do(defaultPrintTask)
+	scheduler.Every(3600).Second().Do(func (){
 		f, err := os.OpenFile("task.txt", os.O_RDWR|os.O_APPEND|os.O_CREATE, os.ModePerm)
 		if err != nil {
 			log.Fatal(err)

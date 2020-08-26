@@ -76,8 +76,16 @@ func OwnerOrAdminToComment() (handlerFunc gin.HandlerFunc) {
 		log.Println("in OwnerOrAdminToComment")
 		u, _ := ctx.Get("user")
 		user, ok := u.(*utils.UserInfo)
+		if !ok {
+
+		}
+		id := ctx.Param("id")
+
+		fmt.Println(user, ok, id)
 		getSql := fmt.Sprintf("select * from comment where id=%s and userId=%d", ctx.Param("id"), user.Id)
-		if ok && (user.IsAdmin || db.Get(new(models.Comment), getSql)){
+		fmt.Println(getSql)
+		c := new(models.Comment)
+		if ok && (user.IsAdmin || db.Get(c, getSql)){
 
 		}else{
 			utils.HttpBadRequest(ctx, "没有权限访问!", nil)

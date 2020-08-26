@@ -27,7 +27,7 @@ type AddVideoParam struct {
 // @Tags 视频
 // @Accept json
 // @Param Body body AddVideoParam true "desc"
-// @Success 200 {string} json "{"message":"创建视频完成!","results":videoObject}"
+// @Success 200 {string} json "{"message": "创建视频完成!","results":videoObject}"
 // @Failure 400 {string} json "{"message": "参数错误/创建失败!", "results": null}"
 // @Router /videos/ [post]
 func AddVideo(ctx *gin.Context) {
@@ -40,7 +40,7 @@ func AddVideo(ctx *gin.Context) {
 	nv := new(models.Video)
 	db.Move(v, nv, []string{})
 	if ok := db.New(nv); ok {
-		utils.HttpOk(ctx, "创建视频完成!", v)
+		utils.HttpOk(ctx, "创建视频完成!", nv)
 	} else {
 		utils.HttpBadRequest(ctx, "创建失败!", nil)
 	}
@@ -64,7 +64,7 @@ func DeleteVideo(ctx *gin.Context) {
 	v := new(models.Video)
 	db.Get(v, fmt.Sprintf("select * from video where id=%s", sid))
 	if db.Delete("video", id) {
-		// TODO 定期任务执行删除
+		// TODO 定期任务执行删除。视频删除后，需要删除视频下的评论
 		utils.HttpOk(ctx, "删除完成！", nil)
 	}else{
 		utils.HttpBadRequest(ctx, "删除失败！", nil)
@@ -158,7 +158,7 @@ func GetVideos(ctx *gin.Context) {
 		utils.HttpBadRequest(ctx, "参数错误!", nil)
 		return
 	}
-	selectSql := "select * from video"
+	selectSql := "select * from video where pass=1"
 	if page != 0{
 		offset := (page-1) * size
 		selectSql += fmt.Sprintf(" limit %d offset %d;", size, offset)

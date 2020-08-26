@@ -1,5 +1,32 @@
 basePath: /api/v1
 definitions:
+  models.Comment:
+    properties:
+      context:
+        description: 内容
+        type: string
+      createdTime:
+        description: 创建时间
+        type: string
+      id:
+        description: 评论id
+        type: integer
+      model:
+        description: 评论关联模型名
+        type: string
+      objId:
+        description: 评论关联对象id
+        type: integer
+      originId:
+        description: 最初评论id
+        type: integer
+      originModel:
+        description: 最初模型
+        type: string
+      userId:
+        description: 创建用户id
+        type: integer
+    type: object
   models.User:
     properties:
       account:
@@ -37,6 +64,39 @@ definitions:
         type: string
       results:
         type: object
+    type: object
+  v1.AddCommentParam:
+    properties:
+      context:
+        description: 内容
+        example: context
+        type: string
+      model:
+        description: 评论关联模型名
+        example: user
+        type: string
+      objId:
+        description: 评论关联对象id
+        example: 1
+        type: integer
+      originId:
+        description: 最初评论id
+        example: 1
+        type: integer
+      originModel:
+        description: 最初模型
+        example: user
+        type: string
+      userId:
+        description: 创建用户id
+        example: 1
+        type: integer
+    required:
+    - model
+    - objId
+    - originId
+    - originModel
+    - userId
     type: object
   v1.AddUserParam:
     properties:
@@ -240,6 +300,124 @@ paths:
       summary: 登录认证2，用于Swagger，只做测试
       tags:
       - 认证
+  /comment/models/:
+    get:
+      consumes:
+      - application/json
+      description: desc
+      responses:
+        "200":
+          description: '{"results": ["user", "comment", "video"]}, "message":""}'
+          schema:
+            type: string
+      summary: 获取评论关联模型表
+      tags:
+      - 评论
+  /comment/video/{vid}/:
+    get:
+      consumes:
+      - application/json
+      description: desc
+      parameters:
+      - description: 视频id
+        in: path
+        name: vid
+        required: true
+        type: string
+      - description: 页数
+        in: query
+        name: page
+        type: string
+      - description: 个数
+        in: query
+        name: size
+        type: string
+      responses:
+        "200":
+          description: '{"results": ["user", "comment", "video"]}, "message":""}'
+          schema:
+            type: string
+      summary: 获取视频评论
+      tags:
+      - 评论
+  /comments/:
+    post:
+      consumes:
+      - application/json
+      description: 添加评论
+      parameters:
+      - description: desc
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/v1.AddCommentParam'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                results:
+                  $ref: '#/definitions/models.Comment'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: 新增评论
+      tags:
+      - 评论
+  /comments/{id}/:
+    delete:
+      consumes:
+      - application/json
+      description: 删除评论
+      parameters:
+      - description: 评论id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{"results": null, "message":"删除完成"}'
+          schema:
+            type: string
+        "400":
+          description: '{"results": null, "message":"参数错误"}'
+          schema:
+            type: string
+      summary: 删除评论
+      tags:
+      - 评论
+    get:
+      consumes:
+      - application/json
+      description: desc
+      parameters:
+      - description: 评论id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 页数
+        in: query
+        name: page
+        type: string
+      - description: 个数
+        in: query
+        name: size
+        type: string
+      responses:
+        "200":
+          description: '{"results": ["user", "comment", "video"]}, "message":""}'
+          schema:
+            type: string
+      summary: 获取评论
+      tags:
+      - 评论
   /test/:
     post:
       consumes:
@@ -496,7 +674,7 @@ paths:
           $ref: '#/definitions/v1.AddVideoParam'
       responses:
         "200":
-          description: '{"message":"创建视频完成!","results":videoObject}'
+          description: '{"message": "创建视频完成!","results":videoObject}'
           schema:
             type: string
         "400":

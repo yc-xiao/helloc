@@ -47,6 +47,12 @@ create table if not exists `video` (
     foreign key(userId) references user(id)
 );
 
+-- 创建视频
+insert into `video` (userId, title, pass) values (1, "黄飞鸿1", 1),
+                                                (1, "黄飞鸿2", 1),
+                                                (1, "黄飞鸿3", 0),
+                                                (4, "黄飞鸿4", 1);
+
 -- 评论(id, objId, model, context, createdTime)
 create table if not exists `comment` (
     `id` int primary key auto_increment,
@@ -54,7 +60,17 @@ create table if not exists `comment` (
     `model` varchar(255) not null,
     `context` text default "",
     `createdTime` varchar(255) default "",
-    `originId` int not null,
+#     `originId` int not null,
+#     `originModel` varchar(255) not null,
     `userId` int default 0,
     foreign key(userId) references user(id)
 );
+
+
+-- 创建评论
+insert into `comment` (userId, context, model, objId) values (1, "用户1->视频1->1星", "video", 1),
+                                                             (2, "用户2->视频1->5星", "video", 1),
+                                                             (2, "用户2->评论1->5星", "comment", 1),
+                                                             (1, "用户1回复->评论3->3星", "comment", 3),
+                                                             (3, "用户3->评论1->5星", "comment", 1);
+

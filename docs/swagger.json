@@ -86,6 +86,190 @@
                 }
             }
         },
+        "/comment/models/": {
+            "get": {
+                "description": "desc",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "评论"
+                ],
+                "summary": "获取评论关联模型表",
+                "responses": {
+                    "200": {
+                        "description": "{\"results\": [\"user\", \"comment\", \"video\"]}, \"message\":\"\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/comment/video/{vid}/": {
+            "get": {
+                "description": "desc",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "评论"
+                ],
+                "summary": "获取视频评论",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "视频id",
+                        "name": "vid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "页数",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "个数",
+                        "name": "size",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"results\": [\"user\", \"comment\", \"video\"]}, \"message\":\"\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/comments/": {
+            "post": {
+                "description": "添加评论",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "评论"
+                ],
+                "summary": "新增评论",
+                "parameters": [
+                    {
+                        "description": "desc",
+                        "name": "Body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.AddCommentParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "results": {
+                                            "$ref": "#/definitions/models.Comment"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/comments/{id}/": {
+            "get": {
+                "description": "desc",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "评论"
+                ],
+                "summary": "获取评论",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "评论id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "页数",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "个数",
+                        "name": "size",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"results\": [\"user\", \"comment\", \"video\"]}, \"message\":\"\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "删除评论",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "评论"
+                ],
+                "summary": "删除评论",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "评论id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"results\": null, \"message\":\"删除完成\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "{\"results\": null, \"message\":\"参数错误\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/test/": {
             "post": {
                 "description": "描述",
@@ -484,7 +668,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "{\"message\":\"创建视频完成!\",\"results\":videoObject}",
+                        "description": "{\"message\": \"创建视频完成!\",\"results\":videoObject}",
                         "schema": {
                             "type": "string"
                         }
@@ -692,6 +876,43 @@
         }
     },
     "definitions": {
+        "models.Comment": {
+            "type": "object",
+            "properties": {
+                "context": {
+                    "description": "内容",
+                    "type": "string"
+                },
+                "createdTime": {
+                    "description": "创建时间",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "评论id",
+                    "type": "integer"
+                },
+                "model": {
+                    "description": "评论关联模型名",
+                    "type": "string"
+                },
+                "objId": {
+                    "description": "评论关联对象id",
+                    "type": "integer"
+                },
+                "originId": {
+                    "description": "最初评论id",
+                    "type": "integer"
+                },
+                "originModel": {
+                    "description": "最初模型",
+                    "type": "string"
+                },
+                "userId": {
+                    "description": "创建用户id",
+                    "type": "integer"
+                }
+            }
+        },
         "models.User": {
             "type": "object",
             "properties": {
@@ -742,6 +963,48 @@
                 },
                 "results": {
                     "type": "object"
+                }
+            }
+        },
+        "v1.AddCommentParam": {
+            "type": "object",
+            "required": [
+                "model",
+                "objId",
+                "originId",
+                "originModel",
+                "userId"
+            ],
+            "properties": {
+                "context": {
+                    "description": "内容",
+                    "type": "string",
+                    "example": "context"
+                },
+                "model": {
+                    "description": "评论关联模型名",
+                    "type": "string",
+                    "example": "user"
+                },
+                "objId": {
+                    "description": "评论关联对象id",
+                    "type": "integer",
+                    "example": 1
+                },
+                "originId": {
+                    "description": "最初评论id",
+                    "type": "integer",
+                    "example": 1
+                },
+                "originModel": {
+                    "description": "最初模型",
+                    "type": "string",
+                    "example": "user"
+                },
+                "userId": {
+                    "description": "创建用户id",
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },

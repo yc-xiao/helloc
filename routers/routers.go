@@ -27,13 +27,13 @@ func AddRouters(r *gin.Engine) {
 	{
 		u := v1.Group("users/")
 		u.GET("", v.GetUsers)
+		u.GET(":id", v.GetUser)
 		u.POST("", v.AddUser)
 
 		u.Use(middlewares.JwtCheckMiddleWare())
 		{
 			u.DELETE(":id", middlewares.IsAdmin(), v.DeleteUser)
 			u.PUT(":id", middlewares.OwnerOrAdmin(), v.ModifyUser)
-			u.GET(":id", v.GetUser)
 			u.PUT(":id/photo", middlewares.OwnerOrAdmin(), v.UploadPhoto)
 			u.PUT(":id/bindPhone", middlewares.OwnerOrAdmin(), v.BindPhone)
 		}
@@ -56,10 +56,13 @@ func AddRouters(r *gin.Engine) {
 	}
 	// 评论
 	{
-		comment := r.Group("comments/")
-		comment.GET(":id/")
-		comment.POST(":id/", middlewares.JwtCheckMiddleWare())
-		comment.DELETE(":id/", middlewares.OwnerOrAdminToComment())
+		comment := v1.Group("comments/")
+		v1.GET("comment/video/:vid/", v.GetCommentByVideo)
+		v1.GET("comment/models/", v.GetModels)
+		comment.GET(":id/", v.GetComment)
+		comment.Use(middlewares.JwtCheckMiddleWare())
+		comment.POST("", middlewares.JwtCheckMiddleWare(), v.AddComment)
+		comment.DELETE(":id/", middlewares.OwnerOrAdminToComment(), v.DeleteComment)
 	}
 
 	// 测试

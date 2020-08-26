@@ -1,4 +1,4 @@
-create database if not exists H;
+create database if not exists H default character set utf8 collate utf8_general_ci;
 
 /*
 create user 'hello'@'%' identified by '123456';
